@@ -1,19 +1,3 @@
-/*
-data flow
-
-topics
----prompt-design--->
-completion queries
----open-ai-api--->
-fetch options
----async-fetch--->
-json responses
----open-ai-api--->
-unpacked data
----write-file--->
-document on disk
-*/
-
 import {promises} from 'fs';
 const fs = promises;
 import * as dotenv from 'dotenv';
@@ -26,6 +10,7 @@ dotenv.config();
 
 const OUTPUT_FOLDER = "./output/content"
 
+
 async function main() {
     console.log("Version 0.1.2");
 
@@ -35,22 +20,19 @@ async function main() {
     //topics are read from the config
     let topics = outline.topics;
 
-    //limit for debugging
-    //topics = topics.slice(5,8);
-
     //create filenames
     topics = topics.map(topic=>({topic, filename: createFilename(topic)}))
     topics = topics.map(({topic, filename}) => ({topic, filename: `${OUTPUT_FOLDER}/${filename}.md`}));
 
-
-
-    //filter already completed topics
+    //determine already completed topics
     const access = await Promise.allSettled(topics.map(({filename}) => fs.access(filename)));
     topics = topics.map(({topic, filename}, idx) => ({topic, filename, exists:access[idx].status=='fulfilled'}));
 
+    //report topics to ignore
     const ignoreTopics = topics.filter(({exists}) => exists);
     console.log("Skipping existing topics: ", ignoreTopics.map(({topic})=>topic));
 
+    //ignore existing topics
     topics = topics.filter(({exists}) => !exists);
 
     //start processing each topic
@@ -61,8 +43,10 @@ async function main() {
     console.log(results);
 }
 
+//execute
 await main();
 
+//perform async data flow for a single topic
 async function processTopic(topic, outputFilename) {
     console.log("Starting: "+topic);
 
@@ -75,8 +59,8 @@ async function processTopic(topic, outputFilename) {
 
         //do fetch
         const res = await fetch(openaiApi.url, fetchOptions);
-        //console.log(fetchOptions)
-        
+
+        //handle HTML error status
         if (!res.ok) {
             throw new Error("Server error: "+res.statusText);
         }
@@ -93,11 +77,13 @@ async function processTopic(topic, outputFilename) {
         return topic;
     }
     catch (err) {
+        //log errors and re-throw
         console.log("Error: "+topic, err);
         throw err;
     }
 }
 
+//create prompt for this topic
 function createPrompt(topic) {
     let prompt = []
     prompt.push({ role: 'system', content: prompts.system});
@@ -110,6 +96,7 @@ function createPrompt(topic) {
     return prompt;
 }
 
+//create the fetch options for the OpenAI API request
 function createFetchOptions(prompt) {
     const openaiApiPayload = {
         temperature: openaiApi.temperature,
@@ -128,6 +115,7 @@ function createFetchOptions(prompt) {
     return options;
 }
 
+//create a base filename for this topic
 function createFilename(topic) {
     return topic.toLowerCase().replace(/\s/g, "-").replace(/[^a-z0-9-]/g, "");
 }

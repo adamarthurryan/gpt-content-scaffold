@@ -11,8 +11,7 @@
   "license": "BSD-2-Clause",
   "type": "module",
   "dependencies": {
-    "dotenv": "^16.0.3"
-  },
-  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "showdown": "^2.1.0"
   }
 }
