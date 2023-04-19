@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node --esm main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Adam Brown (adamarthurryan@gmail.com)",
@@ -11,5 +12,7 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
   }
 }

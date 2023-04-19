@@ -1,4 +1,4 @@
-const outline = `I. Introduction to JavaScript DOM Manipulation API
+I. Introduction to JavaScript DOM Manipulation API
 A. What is the DOM (Document Object Model)?
 B. DOM Manipulation in JavaScript
 C. Importance of DOM manipulation in web development
@@ -61,15 +61,4 @@ D. Cross-browser compatibility
 VII. Conclusion
 A. Recap of JavaScript DOM Manipulation API
 B. Further learning resources
-C. Encouragement for practice and experimentation`;
-
-const sectionsRaw=outline.replace(/^\s+\d\. .*$\n/gm, '');
-
-const sections=sectionsRaw.split('\n\n');
-const topics=sections.map(section=>{
-    const lines = section.split('\n');
-    const sectionNum = lines[0].split('. ')[0];
-    return lines.slice(1).map(line => sectionNum+'.'+line);
-}).flat();
-
-export {topics, outline};
+C. Encouragement for practice and experimentation
