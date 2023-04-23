@@ -1,4 +1,5 @@
 import {promises} from 'fs';
+import * as path from 'path';
 const fs = promises;
 import * as dotenv from 'dotenv';
 import * as outline from './config/outline.js';
@@ -28,6 +29,13 @@ async function main() {
     const access = await Promise.allSettled(topics.map(({filename}) => fs.access(filename)));
     topics = topics.map(({topic, filename}, idx) => ({topic, filename, exists:access[idx].status=='fulfilled'}));
 
+
+    //output table of contents
+
+    let toc = topics.map(({topic, filename}) => `<li><a href="${path.parse(filename).name}.html">${topic}</a></li>`).join("\n");
+     toc = "<ul>\n"+toc+"\n</ul>"
+    await fs.writeFile("./output/index.html",toc);
+
     //report topics to ignore
     const ignoreTopics = topics.filter(({exists}) => exists);
     console.log("Skipping existing topics: ", ignoreTopics.map(({topic})=>topic));
@@ -41,6 +49,7 @@ async function main() {
     //wait until all promises are settled
     const results = await Promise.allSettled(promises);
     console.log(results);
+
 }
 
 //execute
